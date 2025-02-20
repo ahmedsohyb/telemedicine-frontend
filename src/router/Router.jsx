@@ -2,12 +2,12 @@ import React from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import PatientRegistration from '../routes/PatientRegister'
 import Login from '../routes/Login'
-import App from '../routes/App'
 import Home from '../routes/Home'
 import DoctorRegister from '../routes/Docterregister'
 import AdminDashboard from '../routes/AdminDashboard'
 import ApproveDoctors from '../routes/ApproveDoctors'
 import ApproveAppointments from '../routes/ApproveAppointments'
+import RequestAppointment from '../routes/RequestAppointment'
 
 const Router = () => {
   return (
@@ -15,7 +15,7 @@ const Router = () => {
         <Routes>
             <Route path='/register/patient' element={<PatientRegistration />} />
             <Route path='/Login' element={<Login />} />
-            <Route path='/App' element={<App />} />
+            <Route path='/request-appointment' element={<RequestAppointment />} />
             <Route path='/' element={<Home />} />
             <Route path='/register/doctor' element={<DoctorRegister />} />
             <Route path='/admin' element={<AdminDashboard />} />
