@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 
-const DoctorSignUp = () => {
+const DoctorRegister = () => {
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -22,6 +22,14 @@ const DoctorSignUp = () => {
     setFormData({
       ...formData,
       [name]: value,
+    });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]; // الحصول على الملف المختار
+    setFormData({
+      ...formData,
+      syndicateImage: file, // تخزين الصورة في الحالة
     });
   };
 
@@ -95,7 +103,38 @@ const DoctorSignUp = () => {
             required
             style={{ width: '100%', padding: '8px' }}
           />
+        </div> 
+
+
+        <div style={{ marginBottom: '15px' }}>
+          <label>التخصص:</label>
+          <input
+            type="text"
+            name="specialization"
+            value={formData.specialization}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: '8px' }}
+          />
         </div>
+
+              
+         
+
+        
+        <div style={{ marginBottom: '15px' }}>
+          <label>العنوان:</label>
+          <input
+            type="text"
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            required
+            style={{ width: '100%', padding: '8px' }}
+          />
+        </div>
+
+
 
         <div style={{ marginBottom: '15px' }}>
           <label>تاريخ الميلاد:</label>
@@ -109,17 +148,9 @@ const DoctorSignUp = () => {
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label>رقم كارنيه النقابة:</label>
-          <input
-            type="text"
-            name="syndicateNumber"
-            value={formData.syndicateNumber}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
+
+
+
 
         <div style={{ marginBottom: '15px' }}>
           <label>الجنس:</label>
@@ -136,29 +167,27 @@ const DoctorSignUp = () => {
           </select>
         </div>
 
+
+
+
+
+
         <div style={{ marginBottom: '15px' }}>
-          <label>العنوان:</label>
+          <label>صورة كارنيه النقابة:</label>
           <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
+            type="file"
+            name="syndicateImage"
+            onChange={handleImageChange}
+            accept="image/*" // يقبل فقط ملفات الصور
             required
             style={{ width: '100%', padding: '8px' }}
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label>التخصص:</label>
-          <input
-            type="text"
-            name="specialization"
-            value={formData.specialization}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
+
+
+
+        
 
         <button
           type="submit"
@@ -177,10 +206,10 @@ const DoctorSignUp = () => {
       </form>
 
       <p style={{ textAlign: 'center', marginTop: '15px' }}>
-        لديك حساب بالفعل؟ <Link to="/login/doctor">تسجيل الدخول</Link>
+        لديك حساب بالفعل؟ <Link to="/login">تسجيل الدخول</Link>
       </p>
     </div>
   );
 };
 
-export default DoctorSignUp;
+export default DoctorRegister;
