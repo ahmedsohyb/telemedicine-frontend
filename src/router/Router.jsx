@@ -8,12 +8,14 @@ import AdminDashboard from '../routes/AdminDashboard'
 import ApproveDoctors from '../routes/ApproveDoctors'
 import ApproveAppointments from '../routes/ApproveAppointments'
 import RequestAppointment from '../routes/RequestAppointment'
+import DoctorProfile from '../routes/DoctorProfile'
+import PatientProfile from '../routes/PatientProfile'
 
 const Router = () => {
   return (
     <BrowserRouter>
         <Routes>
-            <Route path='/register/patient' element={<PatientRegistration />} />
+            <Route path='/register/patient' element={<PatientRegistration />} /> 
             <Route path='/Login' element={<Login />} />
             <Route path='/request-appointment' element={<RequestAppointment />} />
             <Route path='/' element={<Home />} />
@@ -21,6 +23,8 @@ const Router = () => {
             <Route path='/admin' element={<AdminDashboard />} />
             <Route path='/admin/approve-doctors' element={<ApproveDoctors />} />
             <Route path='/admin/approve-appointments' element={<ApproveAppointments />}/>
+            <Route path='/doctor/profile' element={<DoctorProfile />} />
+            <Route path='/patient/profile' element={<PatientProfile />} />
 
         </Routes>
     </BrowserRouter>
