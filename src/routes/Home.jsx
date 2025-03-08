@@ -18,7 +18,6 @@ const Home = () => {
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
         <Link to="/login" style={linkStyle}>تسجيل الدخول</Link>
         <Link to="/register/doctor" style={linkStyle}>انشاء حساب كطبيب</Link>
-        <Link to="/register/patient" style={linkStyle}>انشاء حساب كمريض</Link>
       </nav>
     </div>
   );

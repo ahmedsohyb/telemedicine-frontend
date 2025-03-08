@@ -1,96 +1,200 @@
 import React, { useState, useEffect } from 'react';
 
 const ApproveDoctors = () => {
-  const [pendingDoctors, setPendingDoctors] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // بيانات وهمية لطلبات الأطباء المعلقة
+  // جلب الأطباء غير المعتمدين
   useEffect(() => {
-    const fakePendingDoctors = [
-      {
-        id: 1,
-        name: 'دكتور أحمد',
-        specialty: 'أمراض القلب',
-        status: 'pending',
-      },
-      {
-        id: 2,
-        name: 'دكتور محمد',
-        specialty: 'جراحة العظام',
-        status: 'pending',
-      },
-    ];
-    setPendingDoctors(fakePendingDoctors);
+    const fetchUnapprovedDoctors = async () => {
+      try {
+        const response = await fetch('/admin/doctors/unapproved', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('فشل في جلب البيانات');
+        }
+
+        const data = await response.json();
+        setDoctors(data);
+        setLoading(false);
+      } catch (err) {
+        setError('حدث خطأ أثناء جلب البيانات');
+        setLoading(false);
+      }
+    };
+
+    fetchUnapprovedDoctors();
   }, []);
 
-  // قبول أو رفض طلب الدكتور
-  const handleRequest = (id, action) => {
-    setPendingDoctors((prev) =>
-      prev.map((doctor) =>
-        doctor.id === id ? { ...doctor, status: action } : doctor
-      )
-    );
-    alert(`تم ${action === 'approved' ? 'قبول' : 'رفض'} الطلب بنجاح!`);
+  // اعتماد طبيب
+  const handleApprove = async (doctorId) => {
+    try {
+      const response = await fetch(`/admin/doctors/${doctorId}/approve`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('فشل في اعتماد الطبيب');
+      }
+
+      // تحديث القائمة بعد الاعتماد
+      setDoctors(doctors.filter((doctor) => doctor.id !== doctorId));
+    } catch (err) {
+      setError('حدث خطأ أثناء الاعتماد');
+    }
   };
 
+  // رفض طبيب
+  const handleReject = async (doctorId) => {
+    try {
+      const response = await fetch(`/admin/doctors/${doctorId}/reject`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('فشل في رفض الطبيب');
+      }
+
+      // تحديث القائمة بعد الرفض
+      setDoctors(doctors.filter((doctor) => doctor.id !== doctorId));
+    } catch (err) {
+      setError('حدث خطأ أثناء الرفض');
+    }
+  };
+
+  // إذا كان التحميل قيد التحميل
+  if (loading) {
+    return <div style={styles.loading}>جاري التحميل...</div>;
+  }
+
+  // إذا كان هناك خطأ
+  if (error) {
+    return <div style={styles.error}>{error}</div>;
+  }
+
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>طلبات الأطباء المعلقة</h2>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-        {pendingDoctors.map((doctor) => (
-          <div
-            key={doctor.id}
-            style={{
-              border: '1px solid #ccc',
-              padding: '10px',
-              borderRadius: '8px',
-              width: '300px',
-            }}
-          >
-            <h3>{doctor.name}</h3>
-            <p>التخصص: {doctor.specialty}</p>
-            {doctor.status === 'pending' && (
-              <div style={{ marginTop: '10px' }}>
+    <div style={styles.container}>
+      <h1 style={styles.title}>إدارة الأطباء غير المعتمدين</h1>
+      <table style={styles.table}>
+        <thead>
+          <tr>
+            <th style={styles.th}>اسم الطبيب</th>
+            <th style={styles.th}>التخصص</th>
+            <th style={styles.th}>تفاصيل السيرة الذاتية</th>
+            <th style={styles.th}>تفاصيل Syndicate ID</th>
+            <th style={styles.th}>الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          {doctors.map((doctor) => (
+            <tr key={doctor.id} style={styles.tr}>
+              <td style={styles.td}>{doctor.name}</td>
+              <td style={styles.td}>{doctor.specialization}</td>
+              <td style={styles.td}>
+                <a href={doctor.cvUrl} target="_blank" rel="noopener noreferrer">
+                  عرض السيرة الذاتية
+                </a>
+              </td>
+              <td style={styles.td}>
+                <a href={doctor.syndicateIdUrl} target="_blank" rel="noopener noreferrer">
+                  عرض Syndicate ID
+                </a>
+              </td>
+              <td style={styles.td}>
                 <button
-                  onClick={() => handleRequest(doctor.id, 'approved')}
-                  style={{
-                    backgroundColor: 'green',
-                    color: '#fff',
-                    border: 'none',
-                    padding: '5px 10px',
-                    marginRight: '10px',
-                    cursor: 'pointer',
-                  }}
+                  style={styles.approveButton}
+                  onClick={() => handleApprove(doctor.id)}
                 >
-                  قبول
+                  اعتماد
                 </button>
                 <button
-                  onClick={() => handleRequest(doctor.id, 'rejected')}
-                  style={{
-                    backgroundColor: 'red',
-                    color: '#fff',
-                    border: 'none',
-                    padding: '5px 10px',
-                    cursor: 'pointer',
-                  }}
+                  style={styles.rejectButton}
+                  onClick={() => handleReject(doctor.id)}
                 >
                   رفض
                 </button>
-              </div>
-            )}
-            {doctor.status !== 'pending' && (
-              <p
-                style={{
-                  color: doctor.status === 'approved' ? 'green' : 'red',
-                }}
-              >
-                {doctor.status === 'approved' ? 'تم القبول' : 'تم الرفض'}
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
+};
+
+// تصميم الصفحة
+const styles = {
+  container: {
+    padding: '20px',
+    fontFamily: 'Arial, sans-serif',
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: '24px',
+    color: '#333',
+    marginBottom: '20px',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    margin: '0 auto',
+  },
+  th: {
+    backgroundColor: '#007bff',
+    color: '#fff',
+    padding: '10px',
+    textAlign: 'left',
+  },
+  tr: {
+    borderBottom: '1px solid #ddd',
+  },
+  td: {
+    padding: '10px',
+    textAlign: 'left',
+  },
+  approveButton: {
+    backgroundColor: '#28a745',
+    color: '#fff',
+    border: 'none',
+    padding: '5px 10px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    marginRight: '5px',
+  },
+  rejectButton: {
+    backgroundColor: '#dc3545',
+    color: '#fff',
+    border: 'none',
+    padding: '5px 10px',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+  loading: {
+    textAlign: 'center',
+    fontSize: '18px',
+    marginTop: '20px',
+  },
+  error: {
+    textAlign: 'center',
+    fontSize: '18px',
+    color: 'red',
+    marginTop: '20px',
+  },
 };
 
 export default ApproveDoctors
