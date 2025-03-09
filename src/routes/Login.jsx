@@ -169,4 +169,4 @@ const styles = {
   },
 };
 
-export default Login;
+export default Login
